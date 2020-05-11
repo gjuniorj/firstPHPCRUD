@@ -3,12 +3,17 @@
 require_once ('dbConnection.php');
 
 
-dbConnect('localhost','sga','','sga_club');
+$mySQLConnection = dbConnect('localhost','sga','','sga_club');
 
-$tableName = "members";
+//$tableName = "members";
+$name    = '\'' . $_GET['firstName'] . '\'';
+$surname = '\'' . $_GET['lastName']  . '\'';
+$age     = '\'' . $_GET['userAge']   . '\'';
 
-$sql = "INSERT into " . $tableName . " VALUES " . $_GET['firstName'] . ", " . $_GET['lastName'] . ", " . $_GET['userAge'] . "; " ;
+$sql = 'INSERT into members (name, surname, age) VALUES (' . $name . ',' . $surname . ',' . $age . '); ' ;
 
 print_r($sql);
 
 mysql_query($sql);
+
+closeConnection($mySQLConnection);

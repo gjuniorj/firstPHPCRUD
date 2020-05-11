@@ -10,6 +10,10 @@ function dbConnect($host, $user, $password, $database)
 
     }
 
+    var_dump($connection);
+
+    return $connection;
+
 }
 
 function closeConnection($connection)
