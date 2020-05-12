@@ -22,6 +22,8 @@ function addMember()
 
     echo "New member registered.";
 
+    closeConnection($mySQLConnection);
+
 }
 
 
@@ -30,22 +32,73 @@ function searchMember()
 {
     $mySQLConnection = dbConnect('localhost','sga','','sga_club');
 
-    $memberName    = "\"" . $_GET['firstName'] . "\"";
-    $memberSurname = "\"" . $_GET['lastName']  . "\"";
-    $memberAge     = "\"" . $_GET['userAge']   . "\"";
+    $memberName    = trim($_GET['firstName']) ;
+    $memberSurname = trim($_GET['lastName'])  ;
+    $memberAge     = trim($_GET['userAge'])   ;
+
+    $sql  = "SELECT name, surname, age FROM members WHERE";
+
+
+    //Dynamically creates sql query
+    if ( $memberName != '' )
+    {
+        $sql .= " name = \"" . $memberName . "\" ";
+    }
+
+    if ( $memberSurname != '' )
+    {
+        //Checks if the last 5 characters of string are "WHERE"
+        $sql .= (substr($sql, -5) === "WHERE") ? '' : " AND";
+        $sql .= " surname = \"" . $memberSurname . "\" ";
+    }
+
+    if ( $memberAge != '' )
+    {
+        //Checks if the last 5 characters of string are "WHERE"
+        $sql .= (substr($sql, -5) === "WHERE") ? '' : " AND";
+        $sql .= " age = \"" . $memberAge . "\" ";
+    }
+
+    $sql .= ";";
+
+
+//    $sql = "SELECT name, surname, age FROM members WHERE" ;
+//    $sql .= " name = " . $memberName . " ";
+//    $sql .= " AND surname = " . $memberSurname . " ";
+//    $sql .= " AND age = " . $memberAge . "; ";
+
+    $result = $mySQLConnection->query($sql);
+    $numMembers = $result->num_rows;
+
+    echo "Result(s):  " . $numMembers . PHP_EOL ;
+
+
+    if ( $numMembers >= 1 )
+    {
+
+        do
+        {
+            $row = mysqli_fetch_row($result);
+
+            $firstName = $row[0];
+            $lastName = $row[1];
+            $age = $row[2];
+
+            echo "$firstName" . " " . $lastName . " " . $age . PHP_EOL;
+
+        } while ( !(is_null($row)) );
+    }
+
+    else
+        echo "No members found.";
 
 
 
-    $sql = "SELECT name, surname, age FROM members WHERE" ;
-    $sql .= " name = \"" . $memberName . "\" ";
-    $sql .= " AND surname = \"" . $memberSurname . "\" ";
-    $sql .= " AND age = \"" . $memberAge . "\"; ";
-
-    $mySQLConnection->query($sql);
-
-    print_r($sql);
 
 
+    //print_r($sql);
+
+    closeConnection($mySQLConnection);
 }
 
 
@@ -66,4 +119,4 @@ switch ($selectedOption)
 }
 
 
-closeConnection($mySQLConnection);
+
